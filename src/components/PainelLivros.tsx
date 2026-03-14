@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { LivroApi } from "@/types/livros";
 import { ModalAlugar } from "./ModalAlugar";
+import { ModalEditarExcluir } from "./ModalEditarExcluir";
 
 export function PainelLivros() {
   const [livros, setLivros] = useState<LivroApi[]>([]);
@@ -21,6 +22,12 @@ export function PainelLivros() {
 
   const [novoTitulo, setNovoTitulo] = useState("");
   const [criando, setCriando] = useState(false);
+
+  const [editModalLivro, setEditModalLivro] = useState<LivroApi | null>(null);
+  const [editTitulo, setEditTitulo] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editExcluindo, setEditExcluindo] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const fetchLivros = useCallback(async () => {
     setError(null);
@@ -92,6 +99,61 @@ export function PainelLivros() {
     }
   };
 
+  const abrirModalEditar = (livro: LivroApi) => {
+    setEditModalLivro(livro);
+    setEditTitulo(livro.titulo);
+    setEditError(null);
+  };
+
+  const fecharModalEditar = () => {
+    setEditModalLivro(null);
+    setEditError(null);
+  };
+
+  const salvarEdicao = async () => {
+    if (!editModalLivro || !editTitulo.trim()) return;
+    setEditLoading(true);
+    setEditError(null);
+    try {
+      const res = await fetch(`/api/livros/${editModalLivro.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo: editTitulo.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setEditError(data?.error ?? "Erro ao salvar");
+        return;
+      }
+      fecharModalEditar();
+      await fetchLivros();
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : "Erro ao salvar");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const excluirLivro = async () => {
+    if (!editModalLivro) return;
+    setEditExcluindo(true);
+    setEditError(null);
+    try {
+      const res = await fetch(`/api/livros/${editModalLivro.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        setEditError(data?.error ?? "Erro ao excluir");
+        return;
+      }
+      fecharModalEditar();
+      await fetchLivros();
+    } catch (e) {
+      setEditError(e instanceof Error ? e.message : "Erro ao excluir");
+    } finally {
+      setEditExcluindo(false);
+    }
+  };
+
   const criarLivro = async () => {
     const titulo = novoTitulo.trim();
     if (!titulo) return;
@@ -151,7 +213,7 @@ export function PainelLivros() {
               type="button"
               onClick={criarLivro}
               disabled={criando || !novoTitulo.trim()}
-              className="rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 disabled:opacity-50"
+              className="cursor-pointer rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 disabled:opacity-50"
             >
               {criando ? "Cadastrando..." : "Cadastrar"}
             </button>
@@ -166,7 +228,7 @@ export function PainelLivros() {
               type="button"
               onClick={abrirModal}
               disabled={livrosDisponiveis.length === 0}
-              className="rounded-lg border border-amber-400 bg-amber-100 px-4 py-2 text-amber-900 hover:bg-amber-200 disabled:opacity-50"
+              className="cursor-pointer rounded-lg border border-amber-400 bg-amber-100 px-4 py-2 text-amber-900 hover:bg-amber-200 disabled:opacity-50"
             >
               Alugar livro
             </button>
@@ -189,7 +251,15 @@ export function PainelLivros() {
                 <tbody>
                   {livros.map((l) => (
                     <tr key={l.id} className="border-b border-amber-100">
-                      <td className="py-3 text-amber-900">{l.titulo}</td>
+                      <td
+                        className="cursor-pointer py-3 text-amber-900 hover:underline hover:text-amber-700"
+                        onClick={() => abrirModalEditar(l)}
+                        onKeyDown={(e) => e.key === "Enter" && abrirModalEditar(l)}
+                        role="button"
+                        tabIndex={0}
+                      >
+                        {l.titulo}
+                      </td>
                       <td className="py-3">
                         {l.alugado ? (
                           <span className="text-amber-800">
@@ -204,7 +274,7 @@ export function PainelLivros() {
                           <button
                             type="button"
                             onClick={() => devolver(l.id)}
-                            className="rounded bg-amber-200/80 px-3 py-1.5 text-amber-900 hover:bg-amber-300/80"
+                            className="cursor-pointer rounded bg-amber-200/80 px-3 py-1.5 text-amber-900 hover:bg-amber-300/80"
                           >
                             Devolver
                           </button>
@@ -220,6 +290,19 @@ export function PainelLivros() {
           )}
         </div>
       </div>
+
+      <ModalEditarExcluir
+        isOpen={!!editModalLivro}
+        livro={editModalLivro}
+        titulo={editTitulo}
+        onTituloChange={setEditTitulo}
+        onClose={fecharModalEditar}
+        onSalvar={salvarEdicao}
+        onExcluir={excluirLivro}
+        loading={editLoading}
+        excluindo={editExcluindo}
+        error={editError}
+      />
 
       <ModalAlugar
         isOpen={modalAberto}

@@ -109,7 +109,7 @@ export function ModalAlugar({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-amber-300 bg-white px-4 py-2 text-amber-800 hover:bg-amber-50"
+            className="cursor-pointer rounded-lg border border-amber-300 bg-white px-4 py-2 text-amber-800 hover:bg-amber-50"
           >
             Cancelar
           </button>
@@ -117,7 +117,7 @@ export function ModalAlugar({
             type="button"
             onClick={onConfirm}
             disabled={loading || livrosDisponiveis.length === 0 || !livroId || !dataDevolucao.trim()}
-            className="rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 disabled:opacity-50"
+            className="cursor-pointer rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700 disabled:opacity-50"
           >
             {loading ? "Alugando..." : "Alugar"}
           </button>
