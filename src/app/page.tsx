@@ -2,6 +2,8 @@
  * Página inicial do Loca Livros.
  */
 
+import { PainelLivros } from "@/components/PainelLivros";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
@@ -15,10 +17,8 @@ export default function Home() {
           </p>
         </header>
 
-        <section className="rounded-2xl border border-amber-200/60 bg-white/80 p-6 shadow-sm backdrop-blur sm:p-8">
-          <p className="text-center text-amber-900/70">
-            Em breve: painel com tabela de livros, alugar e devolver.
-          </p>
+        <section>
+          <PainelLivros />
         </section>
       </div>
     </main>

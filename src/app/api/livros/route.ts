@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, rowToLivro } from "@/lib/db";
 
-/** GET /api/livros – Lista todos os livros. */
+/** GET /api/livros */
 export async function GET() {
   try {
     const conn = await getDb();
@@ -28,7 +28,7 @@ export async function GET() {
   }
 }
 
-/** POST /api/livros – Cria um livro. Body: { "titulo": string } */
+/** POST /api/livros */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

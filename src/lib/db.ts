@@ -38,7 +38,7 @@ export interface LivroRow {
 /** Fuso horário: São Paulo, Brasil. */
 const TZ_SAO_PAULO = "America/Sao_Paulo";
 
-/** Formata uma data para exibição: DD/MM/YYYY. Evita timezone em datas só-dia (ex.: YYYY-MM-DD do MySQL). */
+/** Formata uma data para exibição: DD/MM/YYYY.*/
 export function formatDateBR(value: string | Date | null): string | null {
   if (value == null) return null;
   const s = typeof value === "string" ? value : (value as Date).toISOString().slice(0, 10);
@@ -71,7 +71,7 @@ export function formatDateTimeBR(value: string | Date | null): string {
   }).format(d);
 }
 
-/** Tipo do livro na API. Datas em DD/MM/YYYY; created_at/updated_at em DD/MM/YYYY HH:mm (São Paulo). */
+/** Tipo do livro na API. */
 export interface LivroApi {
   id: number;
   titulo: string;
@@ -81,7 +81,7 @@ export interface LivroApi {
   updated_at: string;
 }
 
-/** Converte linha do banco para formato da API (datas BR, horário São Paulo). */
+/** Converte linha do banco para formato da API. */
 export function rowToLivro(row: {
   id: number;
   titulo: string;

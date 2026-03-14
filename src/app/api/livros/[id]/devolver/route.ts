@@ -1,5 +1,4 @@
 /**
- * Parte 2 – Devolver livro.
  * PATCH /api/livros/[id]/devolver
  * Marca o livro como disponível (alugado = 0, alugado_ate = NULL).
  * Só faz efeito se o livro estiver alugado.
